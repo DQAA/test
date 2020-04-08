@@ -94,21 +94,6 @@ void creatAns(int jj)
     }
 }
 int Next;
-void findnn()
-{
-    is2[Next] = 1;
-    for(int j = g[Next].next;j > 0;j = edge[j].next)
-    {
-        int to = edge[j].to;
-        if(is2[to] == 1)continue;
-        if(isD[to] == 1){
-            Next = to;
-            findnn();
-            break;//?
-        }
-    }
-}
-
 void DFS(int id)
 {
     isD[id] = 1;
@@ -117,10 +102,7 @@ void DFS(int id)
     while(j)
     {
         Next = edge[j].to;
-        /*if(isD[next] == 2){
-            j = edge[j].next;
-            continue;
-        }else*/ if(isD[Next] == 1){
+        if(isD[Next] == 1){
             is2.clear();
             //findnn();
             int jj = 0;
@@ -143,22 +125,10 @@ void DFS(int id)
     return;
 }
 
-/*int cmp2(A a,A b)
-{
-    if(a.num < b.num)return 1;
-    else if(a.num == b.num){
-        A* p;A* q;
-        if(a.id < b.id)return 1;
-        else if(a.id > b.id)return 0;
-        else return *a.next < *b.next;
-    }
-    return 0;
-}*/
-
 int main()
 {
-    //freopen("E:\\test_data.txt","r",stdin);
-    //freopen("E:\\result.txt","w",stdout);
+    freopen("/data/test_data.txt","r",stdin);
+    freopen("/projects/student/result.txt","w",stdout);
     int tmp;
     int n = 0;
     int m = 0;
@@ -195,13 +165,5 @@ int main()
         }
         cout << endl;
     }
-    /*cout << n << " " << m << endl;
-    int j = g[mp[158]].next;
-    cout << g[2].id << endl;
-    while(j != 0)
-    {
-        cout << g[edge[j].to].id << endl;
-        j = g[edge[j].to].next;
-    }*/
     return 0;
 }
