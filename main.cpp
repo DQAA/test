@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
-#define N 100005
-#define M 300005
+#define N 3000005
+#define M 3000005
 
 using namespace std;
 
@@ -37,7 +37,7 @@ void addEdge(int s,int t)
 }
 
 int isD[N];
-int stk[100005];
+int stk[1000005];
 int top;
 struct A{
     int id;
@@ -68,7 +68,7 @@ struct A{
         }
         return 0;
     }
-}ans[100005];
+}ans[3000005];
 int anstot;
 void creatAns(int jj)
 {
