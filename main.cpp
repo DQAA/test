@@ -1,6 +1,6 @@
 #include <bits/stdc++.h>
-#define N 3000005
-#define M 3000005
+#define N 100005
+#define M 300005
 
 using namespace std;
 
@@ -94,8 +94,14 @@ void creatAns(int jj)
     }
 }
 int Next;
-void DFS(int id)
+int last;
+void DFS(int id,int step)
 {
+    /*if(anstot != last){
+        last = anstot;
+        cout << anstot << " " << g[id].id << endl;
+    }*/
+    if(step > 7)return;
     isD[id] = 1;
     stk[top++] = id;
     int j = g[id].next;
@@ -116,19 +122,31 @@ void DFS(int id)
             j = edge[j].next;
             continue;
         }else{
-            DFS(Next);
+            DFS(Next,step+1);
         }
         j = edge[j].next;
     }
-    isD[id] = 2;
+    isD[id] = 0;
     top--;
     return;
 }
-
+int in[N];
+void process(int i)
+{
+    //if(in[i] == -1)return;//??
+    while(g[i].next > 0)
+    {
+        if(--in[edge[g[i].next].to] == 0){
+            in[edge[g[i].next].to] = -1;
+            process(edge[g[i].next].to);
+        }
+        g[i].next = edge[g[i].next].next;
+    }
+}
 int main()
 {
-    freopen("/data/test_data.txt","r",stdin);
-    freopen("/projects/student/result.txt","w",stdout);
+    freopen("E:\\test_data3.txt","r",stdin);
+    //freopen("E:\\result","w",stdout);
     int tmp;
     int n = 0;
     int m = 0;
@@ -148,22 +166,34 @@ int main()
     for(int i = 1;i < n + 1;i++)
         mp[g[i].id] = i;
     for(int i = 0;i < m;i++)
+    {
         addEdge(mp[rd[i].from],mp[rd[i].to]);
+        in[mp[rd[i].to]]++;
+    }
+    //cout << "before tuopu" << endl;
     for(int i = 1;i < n+1;i++)
-        if(isD[i] == 0)DFS(i);
+    {
+        if(in[i] == -1)continue;
+        else if(in[i] == 0)process(i);
+    }
+    //cout << "done tuopu" << endl;
+    //cout << "before DFS" <<endl;
+    for(int i = 1;i < n+1;i++)
+        if(isD[i] == 0 && in[i] != 0)DFS(i,1);
+    //cout << "done DFS" << endl;
     sort(ans,ans+anstot);
     cout << anstot << endl;
     for(int i = 0;i < anstot;i++)
     {
         A* p = &ans[i];
-        cout << p->id;
+        printf("%d",p->id);
         p = p->next;
         while(p)
         {
-            cout << "," << p->id;
+            printf(",%d",p->id);
             p = p->next;
         }
-        cout << endl;
+        printf("\n");
     }
     return 0;
 }
