@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-#define N 100005
+#define N 600005
 #define M 300005
 
 using namespace std;
@@ -172,17 +172,17 @@ int main()
         addEdge(mp[rd[i].from],mp[rd[i].to]);
         in[mp[rd[i].to]]++;
     }
-    cout << "before tuopu" << endl;
+    //cout << "before tuopu" << endl;
     for(int i = 1;i < n+1;i++)
     {
         if(in[i] == -1)continue;
         else if(in[i] == 0)process(i);
     }
-    cout << "done tuopu" << endl;
-    cout << "before DFS" <<endl;
+    //cout << "done tuopu" << endl;
+    //cout << "before DFS" <<endl;
     for(int i = 1;i < n+1;i++)
         if(isD[i] == 0 && in[i] != 0)DFS(i,1);
-    cout << "done DFS" << endl;
+    //cout << "done DFS" << endl;
     sort(ans,ans+anstot);
     cout << anstot << endl;
     cout << time(0) - t << endl;
