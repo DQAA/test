@@ -46,8 +46,8 @@ struct A{
     bool operator == (const struct A b) const{
         if(this->num != b.num || this->id != b.id)return 0;
         const A* p = this;
-        const A*q = &b;
-        for(int i = 0;i < num;i++)
+        const A* q = &b;
+        while(p != NUll && q != NULL)
         {
             if(p->id != q->id)return 0;
             p = p->next;q = q->next;
@@ -72,6 +72,7 @@ struct A{
 int anstot;
 void creatAns()
 {
+    int minn = 0;
     for(int i = 0;i < top;i++)
         if(stk[i] < stk[minn])minn = i;
     A* p = &ans[anstot++];
@@ -82,15 +83,22 @@ void creatAns()
         p->next = new A;
         p = p->next;
         if(i + minn < top)p->id = g[stk[i+minn]].id;
-        else p->id = g[stk[(i+minn)%top + jj]].id;
+        else p->id = g[stk[(i+minn)%top]].id;
     }
-    /*for(int i = 0;i < anstot-1;i++)
+    for(int i = 0;i < anstot-1;i++)
     {
         if(ans[i] == ans[anstot-1]){
-            anstot--;//memory
+            A* p = &ans[--anstot];
+            A* q = p;
+            while(p != NUll)
+            {
+                q = p;
+                p = p->next;
+                delete q;
+            }
             break;
         }
-    }*/
+    }
 }
 int Next;
 int last;
@@ -138,8 +146,9 @@ void process(int i)
 }
 int main()
 {
-    freopen("E:\\test_data3.txt","r",stdin);
+    //freopen("E:\\test_data3.txt","r",stdin);
     //freopen("E:\\result","w",stdout);
+    int t = time(0);
     int tmp;
     int n = 0;
     int m = 0;
@@ -176,7 +185,8 @@ int main()
     cout << "done DFS" << endl;
     sort(ans,ans+anstot);
     cout << anstot << endl;
-    for(int i = 0;i < anstot;i++)
+    cout << time(0) - t << endl;
+    /*for(int i = 0;i < anstot;i++)
     {
         A* p = &ans[i];
         printf("%d",p->id);
@@ -187,6 +197,6 @@ int main()
             p = p->next;
         }
         printf("\n");
-    }
+    }*/
     return 0;
 }
