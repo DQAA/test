@@ -18,7 +18,7 @@ int tag = 2;
 struct nd{
     int from;
     int to;
-}rd[1000005];
+}rd[M];
 map<int,int> mp;
 map<int,bool> is;
 map<int,bool> is2;
@@ -37,7 +37,7 @@ void addEdge(int s,int t)
 }
 
 int isD[N];
-int stk[1000005];
+int stk[10];
 int top;
 struct A{
     int id;
@@ -47,7 +47,7 @@ struct A{
         if(this->num != b.num || this->id != b.id)return 0;
         const A* p = this;
         const A* q = &b;
-        while(p != NUll && q != NULL)
+        while(p != NULL && q != NULL)
         {
             if(p->id != q->id)return 0;
             p = p->next;q = q->next;
@@ -69,6 +69,7 @@ struct A{
         return 0;
     }
 }ans[3000005];
+map<A,bool> re;
 int anstot;
 void creatAns()
 {
@@ -84,13 +85,16 @@ void creatAns()
         p = p->next;
         if(i + minn < top)p->id = g[stk[i+minn]].id;
         else p->id = g[stk[(i+minn)%top]].id;
+        p->next = NULL;
     }
-    for(int i = 0;i < anstot-1;i++)
+    if(re[ans[anstot-1]] == 1)anstot--;
+    else re[ans[anstot-1]] = 1;
+    /*for(int i = 0;i < anstot-1;i++)
     {
         if(ans[i] == ans[anstot-1]){
             A* p = &ans[--anstot];
-            A* q = p;
-            while(p != NUll)
+            /*A* q = p;
+            while(p != NULL)
             {
                 q = p;
                 p = p->next;
@@ -98,16 +102,16 @@ void creatAns()
             }
             break;
         }
-    }
+    }*/
 }
 int Next;
 int last;
 void DFS(int id,int step)
 {
-    if(anstot != last){
+    /*if(anstot != last){
         last = anstot;
         cout << anstot << " " << g[id].id << endl;
-    }
+    }*/
     if(step > 7)return;
     isD[id] = 1;
     stk[top++] = id;
@@ -146,8 +150,8 @@ void process(int i)
 }
 int main()
 {
-    //freopen("E:\\test_data3.txt","r",stdin);
-    //freopen("E:\\result","w",stdout);
+    //freopen("E://test_data3.txt","r",stdin);
+    //freopen("E://result.txt","w",stdout);
     int t = time(0);
     int tmp;
     int n = 0;
@@ -160,10 +164,11 @@ int main()
         }
         if(!is[rd[m].to]){
             g[1+n++].id = rd[m].to;
-            is[rd[m].to] =   1;
+            is[rd[m].to] =     1;
         }
         m++;
     }
+    //cout << "done in" << endl;
     sort(g+1,g+n+1,cmp);
     for(int i = 1;i < n + 1;i++)
         mp[g[i].id] = i;
@@ -184,9 +189,8 @@ int main()
         if(isD[i] == 0 && in[i] != 0)DFS(i,1);
     //cout << "done DFS" << endl;
     sort(ans,ans+anstot);
-    cout << anstot << endl;
-    cout << time(0) - t << endl;
-    /*for(int i = 0;i < anstot;i++)
+    printf("%d\n",anstot);
+    for(int i = 0;i < anstot;i++)
     {
         A* p = &ans[i];
         printf("%d",p->id);
@@ -197,6 +201,7 @@ int main()
             p = p->next;
         }
         printf("\n");
-    }*/
+    }
+    cout << time(0) - t << endl;
     return 0;
 }
