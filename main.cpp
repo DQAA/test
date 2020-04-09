@@ -70,37 +70,36 @@ struct A{
     }
 }ans[3000005];
 int anstot;
-void creatAns(int jj)
+void creatAns()
 {
-    int minn = jj;
-    for(int i = jj;i < top;i++)
+    for(int i = 0;i < top;i++)
         if(stk[i] < stk[minn])minn = i;
     A* p = &ans[anstot++];
     p->id = g[stk[minn]].id;
-    p->num = top-jj;
-    for(int i = 1;i < top - jj;i++)
+    p->num = top;
+    for(int i = 1;i < top;i++)
     {
         p->next = new A;
         p = p->next;
         if(i + minn < top)p->id = g[stk[i+minn]].id;
         else p->id = g[stk[(i+minn)%top + jj]].id;
     }
-    for(int i = 0;i < anstot-1;i++)
+    /*for(int i = 0;i < anstot-1;i++)
     {
         if(ans[i] == ans[anstot-1]){
             anstot--;//memory
             break;
         }
-    }
+    }*/
 }
 int Next;
 int last;
 void DFS(int id,int step)
 {
-    /*if(anstot != last){
+    if(anstot != last){
         last = anstot;
         cout << anstot << " " << g[id].id << endl;
-    }*/
+    }
     if(step > 7)return;
     isD[id] = 1;
     stk[top++] = id;
@@ -111,14 +110,8 @@ void DFS(int id,int step)
         if(isD[Next] == 1){
             is2.clear();
             //findnn();
-            int jj = 0;
-            while(jj < top)
-            {
-                if(stk[jj] == Next)break;
-                jj++;
-            }
             //cout << top-jj << endl;
-            if(top - jj >= 3 && top - jj <= 7)creatAns(jj);
+            if(top >= 3 && top <= 7 && Next == stk[0])creatAns();
             j = edge[j].next;
             continue;
         }else{
@@ -170,17 +163,17 @@ int main()
         addEdge(mp[rd[i].from],mp[rd[i].to]);
         in[mp[rd[i].to]]++;
     }
-    //cout << "before tuopu" << endl;
+    cout << "before tuopu" << endl;
     for(int i = 1;i < n+1;i++)
     {
         if(in[i] == -1)continue;
         else if(in[i] == 0)process(i);
     }
-    //cout << "done tuopu" << endl;
-    //cout << "before DFS" <<endl;
+    cout << "done tuopu" << endl;
+    cout << "before DFS" <<endl;
     for(int i = 1;i < n+1;i++)
         if(isD[i] == 0 && in[i] != 0)DFS(i,1);
-    //cout << "done DFS" << endl;
+    cout << "done DFS" << endl;
     sort(ans,ans+anstot);
     cout << anstot << endl;
     for(int i = 0;i < anstot;i++)
