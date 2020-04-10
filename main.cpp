@@ -87,8 +87,8 @@ void creatAns()
         else p->id = g[stk[(i+minn)%top]].id;
         p->next = NULL;
     }
-    if(re[ans[anstot-1]] == 1)anstot--;
-    else re[ans[anstot-1]] = 1;
+    /*if(re[ans[anstot-1]] == 1)anstot--;
+    else re[ans[anstot-1]] = 1;*/
     /*for(int i = 0;i < anstot-1;i++)
     {
         if(ans[i] == ans[anstot-1]){
@@ -106,12 +106,13 @@ void creatAns()
 }
 int Next;
 int last;
-void DFS(int id,int step)
+void DFS(int first,int id,int step)
 {
     /*if(anstot != last){
         last = anstot;
         cout << anstot << " " << g[id].id << endl;
     }*/
+    if(id < first)return;
     if(step > 7)return;
     isD[id] = 1;
     stk[top++] = id;
@@ -120,14 +121,14 @@ void DFS(int id,int step)
     {
         Next = edge[j].to;
         if(isD[Next] == 1){
-            is2.clear();
+            //is2.clear();
             //findnn();
             //cout << top-jj << endl;
             if(top >= 3 && top <= 7 && Next == stk[0])creatAns();
             j = edge[j].next;
             continue;
         }else{
-            DFS(Next,step+1);
+            DFS(first,Next,step+1);
         }
         j = edge[j].next;
     }
@@ -150,8 +151,8 @@ void process(int i)
 }
 int main()
 {
-    //freopen("E://test_data3.txt","r",stdin);
-    //freopen("E://result.txt","w",stdout);
+    freopen("/data/test_data.txt","r",stdin);
+    freopen("/projects/student/result.txt","w",stdout);
     int t = time(0);
     int tmp;
     int n = 0;
@@ -186,7 +187,7 @@ int main()
     //cout << "done tuopu" << endl;
     //cout << "before DFS" <<endl;
     for(int i = 1;i < n+1;i++)
-        if(isD[i] == 0 && in[i] != 0)DFS(i,1);
+        if(isD[i] == 0 && in[i] != 0)DFS(i,i,1);
     //cout << "done DFS" << endl;
     sort(ans,ans+anstot);
     printf("%d\n",anstot);
