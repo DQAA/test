@@ -37,7 +37,7 @@ void addEdge(int s,int t)
 int isD[N];
 int stk[10];
 int top;
-struct A{
+/*struct A{
     int id;
     int num;
     A* next;
@@ -66,9 +66,26 @@ struct A{
         }
         return 0;
     }
+}ans[3000005];*/
+struct A{
+	int id[7];
+	int num;
+	bool operator < (const struct A b) const{
+		if(this->num < b.num)return 1;
+		else if(this->num == b.num){
+			int p = 0;
+			int q = 0;
+			while(this->id[p] != -1 && b.id[q] != -1)
+			{
+				if(this->id[p] < b.id[q])return 1;
+				else if (this->id[p] > b.id[q])return 0;
+				p++;q++;
+			}
+		}
+	}
 }ans[3000005];
 int anstot;
-void creatAns()
+/*void creatAns()
 {
     A* p = &ans[anstot++];
     p->id = g[stk[0]].id;
@@ -80,11 +97,19 @@ void creatAns()
         p->id = g[stk[i]].id;
         p->next = NULL;
     }
+}*/
+void creatAns()
+{
+	ans[anstot].id[0] = g[stk[0]].id;
+	ans[anstot].num = top;
+	for(int i = 1;i < top;i++)
+		ans[anstot].id[i] = g[stk[i]].id;
+	ans[anstot++].id[top] = -1;
 }
 int Next;
 void DFS(int first,int id)
 {
-	if(top >= 7)reutrn;
+	if(top >= 7)return;
     if(id < first)return;
     isD[id] = 1;
     stk[top++] = id;
@@ -157,15 +182,15 @@ int main()
     printf("%fs\n",ti/CLOCKS_PER_SEC);
     for(int i = 0;i < anstot;i++)
     {
-        A* p = &ans[i];
-        printf("%d",p->id);
-        p = p->next;
-        while(p)
+        printf("%d",ans[i].id[0]);
+        int p = 1;
+        while(ans[i].id[p] != -1)
         {
-            printf(",%d",p->id);
-            p = p->next;
+            printf(",%d",ans[i].id);
+            p++;
         }
         printf("\n");
     }
     return 0;
 }
+//注释掉的版本100万数据400
