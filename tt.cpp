@@ -19,6 +19,7 @@ struct nd{
 map<int,int> mp;
 map<int,bool> is;
 int yid[N];
+int n,m;
 
 void addEdge(int s,int t)
 {
@@ -69,7 +70,7 @@ void DFS(int first,int id,int pid)
     while(j != g[id].end())
     {
         Next[pid] = *j;
-        if(isD[[pid][Next] == 1){
+        if(isD[pid][Next] == 1){
             if(top[pid] >= 3 && Next[pid] == stk[pid][0])creatAns(pid);
         }else{
             DFS(first,Next[pid],pid);
@@ -80,10 +81,15 @@ void DFS(int first,int id,int pid)
     top[pid]--;
     return;
 }
+int Min(int a,int b)
+{
+	if(a < b)return a;
+	else return b;
+}
 void *th(void *ID)
 {
 	long long id = (long long)ID;
-	for(int i = id*(n/num_of_pth) + 1;i < min((id+1)*(n/num_of_pth),n) + 1;i++)
+	for(int i = id*(n/num_of_pth) + 1;i < Min((id+1)*(n/num_of_pth),n) + 1;i++)
 	{
 		DFS(i,i,id);
 	}
@@ -117,9 +123,16 @@ int main()
     //freopen("/projects/student/result.txt","w",stdout);
     //int t = clock();
 	gettimeofday(&Begin,NULL);
+	memset(anstot,0,sizeof(anstot));
+	memset(top,0,sizeof(top));
+	memset(Next,0,sizeof(Next));
+	for(int i = 0;i < num_of_pth;i++)
+		for(int j = 0;j < N;j++)
+			isD[i][j] = 0;
+	for(int i = 0;i < num_of_pth;i++)
+		for(int j = 0;j < 10;j++)
+			stk[i][j] = 0;
     int tmp;
-    int n = 0;
-    int m = 0;
     while(scanf("%d,%d,%d",&rd[m].from,&rd[m].to,&tmp) != EOF)
     {
         if(!is[rd[m].from]){
@@ -156,7 +169,7 @@ int main()
 	}
 	pthread_t threads[num_of_pth];
 	for(int i = 0;i < num_of_pth;i++)
-		pthread_create(&threads[i],NULL,th,(void*)i)
+		pthread_create(&threads[i],NULL,th,(void*)i);
 	for(int i = 0;i < num_of_pth;i++)
 		pthread_join(threads[i],NULL);
     /*for(int i = 1;i < n+1;i++)
@@ -174,7 +187,7 @@ int main()
 	//double ti = clock() - t;
     //printf("%fs\n",ti/CLOCKS_PER_SEC);
 	gettimeofday(&End,NULL);
-	timer = 1000000 * (End.tv_sec - End.tv_sec) + (End.tv_usec - End.tv_usec);
+	timer = 1000000 * (End.tv_sec - Begin.tv_sec) + (End.tv_usec - Begin.tv_usec);
 	printf("%fs\n",timer/1000000);
     /*for(int i = 0;i < anstot;i++)
     {
