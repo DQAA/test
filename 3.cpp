@@ -4,8 +4,8 @@
 
 using namespace std;
 
-int g[N][50];
-int fg[N][50];
+vector<int> g[N];
+vector<int> fg[N];
 
 struct nd{
     int from;
@@ -14,6 +14,11 @@ struct nd{
 map<int,int> mp;
 map<int,bool> is;
 int yid[N];
+
+void addEdge(int s,int t)
+{
+	g[s].push_back(t);
+}
 
 int isD[N];
 int stk[10];
@@ -55,18 +60,19 @@ void DFS(int first,int id)
 	if(out[id] == -1)return;
     isD[id] = 1;
     stk[top++] = id;
-	int num_of_edge = g[id][0];
-	for(int i = 1;i < num_of_edge;i++)
+	vector<int>:: iterator j = g[id].begin();
+    while(j != g[id].end())
     {
-        Next = g[id][0];
+        Next = *j;
         if(isD[Next] == 1){
             if(top >= 3 && Next == stk[0]){
 				creatAns();
-				break;
+				if(top == 7)break;
 			}
         }else{
             DFS(first,Next);
         }
+        j++;
     }
     isD[id] = 0;
     top--;
@@ -74,23 +80,32 @@ void DFS(int first,int id)
 }
 void processIn(int i)
 {
-	in[i] = -1;
-	int num_of_edge = g[i][0];
-	for(int j = 1;j <= num_of_edge;j++)
-        if(--in[g[i][j]] == 0)processIn(g[i][0]);
+    while(g[i].begin() != g[i].end())
+    {
+        if(--in[g[i][0]] == 0){
+            in[g[i][0]] = -1;
+            processIn(g[i][0]);
+        }
+		g[i].erase(g[i].begin());
+    }
 }
 void processOut(int i)
 {
 	out[i] =  -1;
-	int num_of_edge = g[i][0];
-	for(int j = 1;j <= num_of_edge;j++)
-		if(--out[fg[i][0]] == 0)processOut(fg[i][0]);
+	while(fg[i].begin() != fg[i].end())
+	{
+		//g[i].erase(it - fg[i].begin() + g[i].begin());
+		if(--out[fg[i][0]] == 0){
+			processOut(fg[i][0]);
+		}
+		fg[i].erase(fg[i].begin());
+	}
 }
 int main()
 {
     freopen("/data/test_data.txt","r",stdin);
     freopen("/projects/student/result.txt","w",stdout);
-    int t = clock();
+    //int t = clock();
     int tmp;
     int n = 0;
     int m = 0;
@@ -113,8 +128,8 @@ int main()
     {
 		int s = mp[rd[i].from];
 		int t = mp[rd[i].to];
-        g[s][++g[s][0]] = t;
-		fg[t][++fg[t][0]] = s;
+        addEdge(s,t);
+		fg[t].push_back(s);
         in[t]++;
 		out[s]++;
     }
@@ -133,7 +148,7 @@ int main()
     sort(ans,ans+anstot);
     printf("%d\n",anstot);
 	//double ti = clock() - t;
-    printf("%fs\n",ti/CLOCKS_PER_SEC);
+    //printf("%fs\n",ti/CLOCKS_PER_SEC);
     for(int i = 0;i < anstot;i++)
     {
         printf("%d",ans[i].id[0]);
