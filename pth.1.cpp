@@ -38,9 +38,9 @@ void addEdge(int s,int t)
     g[s].next = tot;
 }
 
-int isD0[N],isD1[N];
-int stk0[10],stk1[10];
-int top0,top1;
+int isD0[N],isD1[N],isD2[N],isD3[N];
+int stk0[10],stk1[10],stk2[10],stk3[10];
+int top0,top1,top2,top3;
 int n,m;
 /*struct A{
     int id;
@@ -116,7 +116,7 @@ void creatAns0()
 		ans0[anstot0].id[i] = g[stk0[i]].id;
 	ans0[anstot0++].id[top0] = -1;
 }
-int Next0,Next1;
+int Next0,Next1,Next2,Next3;
 void DFS0(int first,int id)
 {
 	if(top0 >= 7)return;
@@ -128,7 +128,10 @@ void DFS0(int first,int id)
     {
         Next0 = edge[j].to;
         if(isD0[Next0] == 1){
-            if(top0 >= 3 && Next0 == stk0[0])creatAns0();
+            if(top0 >= 3 && Next0 == stk0[0]){
+				creatAns0();
+				if(top0 == 7)break;
+			}
         }else{
             DFS0(first,Next0);
         }
@@ -157,7 +160,10 @@ void DFS1(int first,int id)
     {
         Next1 = edge[j].to;
         if(isD1[Next1] == 1){
-            if(top1 >= 3 && Next1 == stk1[0])creatAns1();
+            if(top1 >= 3 && Next1 == stk1[0]){
+				creatAns1();
+				if(top1 == 7)break;
+			}
         }else{
             DFS1(first,Next1);
         }
@@ -167,15 +173,89 @@ void DFS1(int first,int id)
     top1--;
     return;
 }
+void creatAns2()
+{
+	ans2[anstot2].id[0] = g[stk2[0]].id;
+	ans2[anstot2].num = top2;
+	for(int i = 1;i < top2;i++)
+		ans2[anstot2].id[i] = g[stk2[i]].id;
+	ans2[anstot2++].id[top2] = -1;
+}
+void DFS2(int first,int id)
+{
+	if(top2 >= 7)return;
+    if(id < first)return;
+    isD2[id] = 1;
+    stk2[top2++] = id;
+    int j = g[id].next;
+    while(j)
+    {
+        Next2 = edge[j].to;
+        if(isD2[Next2] == 1){
+            if(top2 >= 3 && Next2 == stk2[0]){
+				creatAns2();
+				if(top2 == 7)break;
+			}
+        }else{
+            DFS2(first,Next2);
+        }
+        j = edge[j].next;
+    }
+    isD2[id] = 0;
+    top2--;
+    return;
+}
+void creatAns3()
+{
+	ans3[anstot3].id[0] = g[stk3[0]].id;
+	ans3[anstot3].num = top3;
+	for(int i = 1;i < top3;i++)
+		ans3[anstot3].id[i] = g[stk3[i]].id;
+	ans3[anstot3++].id[top3] = -1;
+}
+void DFS3(int first,int id)
+{
+	if(top3 >= 7)return;
+    if(id < first)return;
+    isD3[id] = 1;
+    stk3[top3++] = id;
+    int j = g[id].next;
+    while(j)
+    {
+        Next3 = edge[j].to;
+        if(isD3[Next3] == 1){
+            if(top3 >= 3 && Next3 == stk3[0]){
+				creatAns3();
+				if(top3 == 7)break;
+			}
+        }else{
+            DFS3(first,Next3);
+        }
+        j = edge[j].next;
+    }
+    isD3[id] = 0;
+    top3--;
+    return;
+}
 void *th0(void *a)
 {
 	for(int i = 1;i < n+1;i++)
-		if(i%2 == 1)DFS0(i,i);
+		if(i%2 == 0)DFS0(i,i);
 }
 void *th1(void *a)
 {
 	for(int i = 1;i < n+1;i++)
-		if(i%2 == 0)DFS1(i,i);
+		if(i%2 == 1)DFS1(i,i);
+}
+void *th2(void *a)
+{
+	for(int i = 1;i < n+1;i++)
+		if(i%2 == 2)DFS2(i,i);
+}
+void *th3(void *a)
+{
+	for(int i = 1;i < n+1;i++)
+		if(i%2 == 3)DFS3(i,i);
 }
 int in[N];
 void process(int i)
@@ -192,8 +272,8 @@ void process(int i)
 }
 int main()
 {
-    //freopen("/data/test_data.txt","r",stdin);
-    //freopen("/projects/student/result.txt","w",stdout);
+    freopen("/data/test_data.txt","r",stdin);
+    freopen("/projects/student/result.txt","w",stdout);
 	//gettimeofday(&start,NULL);
     //int t = clock();
     int tmp;
@@ -222,22 +302,33 @@ int main()
         if(in[i] == -1)continue;
         else if(in[i] == 0)process(i);
     }
-	pthread_t threads[2];
+	pthread_t threads[4];
 	pthread_create(&threads[0],NULL,th0,NULL);
 	pthread_create(&threads[1],NULL,th1,NULL);
+	pthread_create(&threads[2],NULL,th2,NULL);
+	pthread_create(&threads[3],NULL,th3,NULL);
 	pthread_join(threads[0],NULL);
 	pthread_join(threads[1],NULL);
-	int anstot = anstot0 + anstot1;
+	pthread_join(threads[2],NULL);
+	pthread_join(threads[3],NULL);
+	//int anstot = anstot0 + anstot1 + anstot2 + anstot3;
 	for(int i = 0;i < anstot1;i++)
 		ans0[i + anstot0] = ans1[i];
-	sort(ans0,ans0+anstot);
+	anstot0 += anstot1;
+	for(int i = 0;i < anstot2;i++)
+		ans0[i + anstot0] = ans1[i];
+	anstot0 += anstot2;
+	for(int i = 0;i < anstot3;i++)
+		ans0[i + anstot0] = ans1[i];
+	anstot0 += anstot3;
+	sort(ans0,ans0+anstot0);
     /*for(int i = 1;i < n+1;i++)
         if(isD[i] == 0 && in[i] != 0)DFS(i,i);
     sort(ans,ans+anstot);*/
     printf("%d\n",anstot);
 	//gettimeofday(&End,NULL);
 	//timer = 1000000 * (End.tv_sec - start.tv_sec) + End.tv_usec - start.tv_usec;
-	printf("%fs\n",timer/1000000);
+	//printf("%fs\n",timer/1000000);
 	//double ti = clock() - t;
     //printf("%fs\n",ti/CLOCKS_PER_SEC);
     for(int i = 0;i < anstot;i++)
