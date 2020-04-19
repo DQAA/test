@@ -1,5 +1,6 @@
 #include <bits/stdc++.h>
 #include <unordered_map>
+#include <sys/time.h>
 #define N 600005
 #define M 300005
 
@@ -7,6 +8,9 @@ using namespace std;
 
 int g[N][50];
 int fg[N][50];
+struct timeval Begin;
+struct timeval End;
+double timer;
 
 struct nd{
     int from;
@@ -15,8 +19,8 @@ struct nd{
 unordered_map<int,int> mp;
 unordered_map<int,bool> is;
 int yid[N];
-
-int isD[N];
+int n,m;
+int isD[4][N];
 int stk[4][10];
 int top[4];
 struct A{
@@ -45,7 +49,7 @@ void creatAns(int pid)
 	ans[pid][anstotq].num = top[pid];
 	for(int i = 1;i < top[pid];i++)
 		ans[pid][anstotq].id[i] = yid[stk[pid][i]];
-	ans[pid][anstotq++].id[top[pid]] = -1;
+	ans[pid][anstot[pid]++].id[top[pid]] = -1;
 }
 int b;
 int in[N];
@@ -56,15 +60,15 @@ void DFS(int first,int id,int pid)
     if(id < first)return;
 	if(out[id] == -1)return;
     isD[pid][id] = 1;
-    stk[top++] = id;
-	//if(top)b++;//faster
+    stk[pid][top[pid]++] = id;
+	if(top[pid])b++;//faster
 	int num_of_edge = g[id][0];
 	for(int i = 1;i <= num_of_edge;i++)
     {
         int Next = g[id][i];
-        if(isD[Next] == 1){
+        if(isD[pid][Next] == 1){
             if(top[pid] >= 3 && Next == stk[pid][0]){
-				creatAns();
+				creatAns(pid);
 				if(top[pid] == 7)break;
 			}
         }else{
@@ -77,7 +81,7 @@ void DFS(int first,int id,int pid)
 }
 void *th(void *ID)
 {
-	long long pid = ID;
+	long long pid = (long long)ID;
 	for(int i =  1;i < n + 1;i++)
 		if(i%4 == pid)DFS(i,i,pid);
 }
@@ -99,10 +103,8 @@ int main()
 {
     //freopen("/data/test_data.txt","r",stdin);
     //freopen("/projects/student/result.txt","w",stdout);
-    int t = clock();
+    gettimeofday(&Begin,NULL);
     int tmp;
-    int n = 0;
-    int m = 0;
     while(scanf("%d,%d,%d",&rd[m].from,&rd[m].to,&tmp) != EOF)
     {
         if(!is[rd[m].from]){
@@ -137,19 +139,20 @@ int main()
 		if(out[i] == -1)continue;
 		else if(out[i] == 0)processOut(i);
 	}
-	pthreads_t thread[4];
+	pthread_t thread[4];
 	for(int i = 0;i < 4;i++)
-		pthread_create(&pthread[i],NULL,th,(void*)i);
+		pthread_create(&thread[i],NULL,th,(void*)i);
 	for(int i = 0;i < 4;i++)
-		pthread_join(pthread[i],NULL);
+		pthread_join(thread[i],NULL);
 	for(int i = 1;i < 4;i++)
 		for(int j = 0;j < anstot[i];j++)
-			ans[0][anstot[1]++] = ans[i][j];
+			ans[0][anstot[0]++] = ans[i][j];
     sort(ans[0],ans[0]+anstot[0]);
     printf("%d\n",anstot[0]);
 	//cout << b << endl;
-	double ti = clock() - t;
-    printf("%fs\n",ti/CLOCKS_PER_SEC);
+	gettimeofday(&End,NULL);
+	timer = 1000000 * (End.tv_sec - Begin.tv_sec) + End.tv_usec - Begin.tv_usec;
+	printf("%fs\n",timer/1000000);
     /*for(int i = 0;i < anstot[0];i++)
     {
         printf("%d",ans[0][i].id[0]);
