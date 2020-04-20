@@ -1,12 +1,17 @@
 #include <bits/stdc++.h>
 #include <unordered_map>
+#include <sys/time.h>
 #define N 600005
 #define M 300005
+#define pth 2
 
 using namespace std;
 
 int g[N][50];
 int fg[N][50];
+struct timeval Begin;
+struct timeval End;
+double timer;
 
 struct nd{
     int from;
@@ -14,13 +19,11 @@ struct nd{
 }rd[M];
 unordered_map<int,int> mp;
 unordered_map<int,bool> is;
-vector<unordered_map<int,vector<int>>> target;
-unordered_map<int,int> itv;
 int yid[N];
-
-int isD[N];
-int stk[10];
-int top;
+int n,m;
+int isD[pth][N];
+int stk[pth][10];
+int top[pth];
 struct A{
 	int id[8];//7时排序出错，过程未知
 	int num;
@@ -38,97 +41,56 @@ struct A{
 		}
 		return 0;
 	}
-}ans[3000005];
-int anstot;
-void creatAns()
+}ans[pth][3000005];
+int anstot[pth];
+void creatAns(int pid)
 {
-	ans[anstot].id[0] = yid[stk[0]];
-	ans[anstot].num = top;
-	for(int i = 1;i < top;i++)
-		ans[anstot].id[i] = yid[stk[i]];
-	ans[anstot++].id[top] = -1;
+	int anstotq = anstot[pid];
+	ans[pid][anstotq].id[0] = yid[stk[pid][0]];
+	ans[pid][anstotq].num = top[pid];
+	for(int i = 1;i < top[pid];i++)
+		ans[pid][anstotq].id[i] = yid[stk[pid][i]];
+	ans[pid][anstot[pid]++].id[top[pid]] = -1;
 }
-int c;
-int Next;
+int b;
 int in[N];
 int out[N];
-void DFS(int first,int id)
+void DFS(int first,int id,int pid)
 {
-	if(top >= 6)return;
+	if(top[pid] >= 7)return;
     if(id < first)return;
 	if(out[id] == -1)return;
-    isD[id] = 1;
-    stk[top++] = id;
-	if(top)c++;//faster
-	if(top == 6){
-		int i = itv[id];
-		if(i){
-			i--;
-			if(target[i].find(first) != target[i].end()){
-				for(int j = 0;j < target[i][first].size();j++)
-				{
-					if(isD[target[i][first][j]] == 1)continue;
-					stk[top++] = target[i][first][j];
-					creatAns();
-					top--;
-				}
-			}
-		}
-	}
+    isD[pid][id] = 1;
+    stk[pid][top[pid]++] = id;
+	//if(top[pid])b++;//faster
 	int num_of_edge = g[id][0];
 	for(int i = 1;i <= num_of_edge;i++)
     {
-        Next = g[id][i];
-        if(isD[Next] == 1){
-            if(top >= 3 && Next == stk[0]){
-				creatAns();
-				if(top == 6)break;
+        int Next = g[id][i];
+        if(isD[pid][Next] == 1){
+            if(top[pid] >= 3 && Next == stk[pid][0]){
+				creatAns(pid);
+				if(top[pid] == 7)break;
 			}
         }else{
-            DFS(first,Next);
+            DFS(first,Next,pid);
         }
     }
-    isD[id] = 0;
-    top--;
+    isD[pid][id] = 0;
+    top[pid]--;
     return;
 }
-bool ismk[N];
-void mktarget(int first,int id,int step)
+void *th(void *ID)
 {
-	if(ismk[id])return;
-	ismk[id] = 1;
-	if(step == 1){
-		int jie = g[id][0];
-		for(int i=1;i <= jie;i++)
-			mktarget(first,g[id][i],step+1);
-	}else{
-		int jie = g[id][0];
-		for(int i=1;i <= jie;i++)
-		{
-			if(first < g[id][i] || id < g[id][i] || ismk[g[id][i]])continue;
-			if(!itv[first]){
-				itv[first] = target.size()+1;
-				unordered_map<int,vector<int>> a;
-				a.clear();
-				vector<int> b;
-				b.clear();
-				b.push_back(id);
-				a[g[id][i]] = b;
-				target.push_back(a);
-			}else{
-				int j = itv[first]-1;
-				if(target[j].find(g[id][i]) == target[j].end()){
-					vector<int> a;
-					a.clear();
-					a.push_back(id);
-					target[j][g[id][i]] = a;
-				}else{
-					target[j][g[id][i]].push_back(id);
-				}
-			}
-		}
-	}
-	ismk[id] = 0;
+	struct timeval a,b;
+	double t;
+	gettimeofday(&a,NULL);
+	long long pid = (long long)ID;
+	for(int i =  1;i < n + 1;i++)
+		if(i%pth == pid)DFS(i,i,pid);
+	gettimeofday(&b,NULL);
+	t = 1000000 * (b.tv_sec - a.tv_sec) + b.tv_usec - a.tv_usec;
+	printf("%d:%fs\n",pid,t/1000000);
 }
 void processIn(int i)
 {
@@ -148,10 +110,8 @@ int main()
 {
     //freopen("/data/test_data.txt","r",stdin);
     //freopen("/projects/student/result.txt","w",stdout);
-    int t = clock();
+    gettimeofday(&Begin,NULL);
     int tmp;
-    int n = 0;
-    int m = 0;
     while(scanf("%d,%d,%d",&rd[m].from,&rd[m].to,&tmp) != EOF)
     {
         if(!is[rd[m].from]){
@@ -186,22 +146,27 @@ int main()
 		if(out[i] == -1)continue;
 		else if(out[i] == 0)processOut(i);
 	}
-	for(int i = 1;i < n+1;i++)
-		 if(in[i] > 0 && out[i] > 0)mktarget(i,i,1);
-	for(int i = 1;i < n+1;i++)
-        if(isD[i] == 0 && in[i] > 0)DFS(i,i);
-    sort(ans,ans+anstot);
-    printf("%d\n",anstot);
+	pthread_t thread[pth];
+	for(int i = 0;i < pth;i++)
+		pthread_create(&thread[i],NULL,th,(void*)i);
+	for(int i = 0;i < pth;i++)
+		pthread_join(thread[i],NULL);
+	for(int i = 1;i < pth;i++)
+		for(int j = 0;j < anstot[i];j++)
+			ans[0][anstot[0]++] = ans[i][j];
+    sort(ans[0],ans[0]+anstot[0]);
+    printf("%d\n",anstot[0]);
 	//cout << b << endl;
-	double ti = clock() - t;
-    printf("%fs\n",ti/CLOCKS_PER_SEC);
-    /*for(int i = 0;i < anstot;i++)
+	gettimeofday(&End,NULL);
+	timer = 1000000 * (End.tv_sec - Begin.tv_sec) + End.tv_usec - Begin.tv_usec;
+	printf("%fs\n",timer/1000000);
+    /*for(int i = 0;i < anstot[0];i++)
     {
-        printf("%d",ans[i].id[0]);
+        printf("%d",ans[0][i].id[0]);
         int p = 1;
-        while(ans[i].id[p] != -1)
+        while(ans[0][i].id[p] != -1)
         {
-            printf(",%d",ans[i].id[p]);
+            printf(",%d",ans[0][i].id[p]);
             p++;
         }
         printf("\n");
