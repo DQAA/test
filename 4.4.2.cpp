@@ -17,6 +17,7 @@ unordered_map<int,bool> is;
 struct B{
 	int a;
 	int b;
+	int c;
 };
 vector<unordered_map<int,vector<B>>> target;
 //unordered_map<int,int> itv;
@@ -26,34 +27,8 @@ int yid[N];
 int isD[N];
 int stk[10];
 int top;
-/*struct A{
-	int id[8];//7时排序出错，过程未知
-	int num;
-	bool operator < (const struct A b) const{
-		if(this->num < b.num)return 1;
-		else if(this->num == b.num){
-			int p = 0;
-			int q = 0;
-			while(this->id[p] != -1 && b.id[q] != -1)
-			{
-				if(this->id[p] < b.id[q])return 1;
-				else if (this->id[p] > b.id[q])return 0;
-				p++;q++;
-			}
-		}
-		return 0;
-	}
-}ans[3000005];*/
 int ans3[3000005][3],ans4[3000005][4],ans5[3000005][5],ans6[3000005][6],ans7[3000005][7];
 int anstot3,anstot4,anstot5,anstot6,anstot7;
-/*void creatAns()
-{
-	ans[anstot].id[0] = yid[stk[0]];
-	ans[anstot].num = top;
-	for(int i = 1;i < top;i++)
-		ans[anstot].id[i] = yid[stk[i]];
-	ans[anstot++].id[top] = -1;
-}*/
 void creatAns()
 {
 	if(top == 3){
@@ -78,6 +53,35 @@ void creatAns()
 		anstot7++;
 	}
 }
+/*void creatAns()
+{
+	switch(top){
+		case 3:
+			for(int i = 0;i < 3;i++)
+				ans3[anstot3][i] = stk[i];
+			anstot3++;
+			break;
+		case 4:
+			for(int i = 0;i < 4;i++)
+				ans4[anstot4][i] = stk[i];
+			anstot4++;
+			break;
+		case 5:
+			for(int i = 0;i < 5;i++)
+				ans5[anstot5][i] = stk[i];
+			anstot5++;
+			break;
+		case 6:
+			for(int i = 0;i < 6;i++)
+				ans6[anstot6][i] = stk[i];
+			anstot6++;
+			break;
+		case 7:
+			for(int i = 0;i < 7;i++)
+				ans7[anstot7][i] = stk[i];
+			anstot7++;
+	}
+}*/
 int c;
 int Next;
 int in[N];
@@ -86,8 +90,8 @@ void DFS(int first,int id)
 {
     isD[id] = 1;
     stk[top++] = id;
-	if(top)c++;//faster
-	if(top == 5){
+	//if(top)c++;//faster
+	if(top == 4){
 		int i = itv[id];
 		if(i){
 			i--;
@@ -95,11 +99,12 @@ void DFS(int first,int id)
 			if((it = target[i].find(first)) != target[i].end()){
 				for(int j = 0;j < (it->second).size();j++)
 				{
-					if(isD[(it->second)[j].a] == 1 || isD[(it->second)[j].b] == 1)continue;
+					if(isD[(it->second)[j].a] == 1 || isD[(it->second)[j].b] == 1 || isD[(it->second)[j].c] == 1)continue;
 					stk[top++] = (it->second)[j].a;
 					stk[top++] = (it->second)[j].b;
+					stk[top++] = (it->second)[j].c;
 					creatAns();
-					top -= 2;
+					top -= 3;
 				}
 			}
 		}
@@ -122,18 +127,22 @@ void DFS(int first,int id)
     return;
 }
 bool ismk[N];
-void mktarget(int first,int second,int id,int step)
+void mktarget(int first,int second,int third,int id,int step)
 {
 	if(ismk[id])return;
 	ismk[id] = 1;
 	if(step == 1){
 		int jie = g[id][0];
 		for(int i=1;i <= jie;i++)
-			mktarget(first,second,g[id][i],step+1);
+			mktarget(first,second,third,g[id][i],step+1);
 	}else if(step == 2){
 		int jie = g[id][0];
 		for(int i=1;i <= jie;i++)
-			mktarget(first,id,g[id][i],step+1);
+			mktarget(first,id,third,g[id][i],step+1);
+	}else if(step == 3){
+		int jie = g[id][0];
+		for(int i=1;i <= jie;i++)
+			mktarget(first,second,id,g[id][i],step+1);
 	}else{
 		int jie = g[id][0];
 		for(int i=1;i <= jie;i++)
@@ -147,7 +156,8 @@ void mktarget(int first,int second,int id,int step)
 				b.clear();
 				B c;
 				c.a = second;
-				c.b = id;
+				c.b = third;
+				c.c = id;
 				b.push_back(c);
 				a[g[id][i]] = b;
 				target.push_back(a);
@@ -158,13 +168,15 @@ void mktarget(int first,int second,int id,int step)
 					a.clear();
 					B c;
 					c.a = second;
-					c.b = id;
+					c.b = third;
+					c.c = id;
 					a.push_back(c);
 					target[j][g[id][i]] = a;
 				}else{
 					B c;
 					c.a = second;
-					c.b = id;
+					c.b = third;
+					c.c = id;
 					target[j][g[id][i]].push_back(c);
 				}
 			}
@@ -231,7 +243,7 @@ int main()
 	for(int i = 1;i < n+1;i++)
 		if(in[i] > 0 && out[i] > 0)sort(g[i]+1,g[i]+1+g[i][0]);
 	for(int i = 1;i < n+1;i++)
-		 if(in[i] > 0 && out[i] > 0)mktarget(i,0,i,1);
+		 if(in[i] > 0 && out[i] > 0)mktarget(i,0,0,i,1);
 	for(int i = 1;i < n+1;i++)
         if(isD[i] == 0 && in[i] > 0)DFS(i,i);
     //sort(ans,ans+anstot);
@@ -240,16 +252,40 @@ int main()
 	//cout << b << endl;
 	double ti = clock() - t;
     printf("%fs\n",ti/CLOCKS_PER_SEC);
-    /*for(int i = 0;i < anstot;i++)
+    /*for(int i = 0;i < anstot3;i++)
     {
-        printf("%d",ans[i].id[0]);
-        int p = 1;
-        while(ans[i].id[p] != -1)
-        {
-            printf(",%d",ans[i].id[p]);
-            p++;
-        }
-        printf("\n");
+		printf("%d",ans3[i][0]);
+		for(int j =  1;j < 3;j++)
+			printf(",%d",ans3[i][j]);
+		printf("\n");
+    }
+	for(int i = 0;i < anstot4;i++)
+    {
+		printf("%d",ans4[i][0]);
+		for(int j =  1;j < 4;j++)
+			printf(",%d",ans4[i][j]);
+		printf("\n");
+    }
+	for(int i = 0;i < anstot5;i++)
+    {
+		printf("%d",ans5[i][0]);
+		for(int j =  1;j < 5;j++)
+			printf(",%d",ans5[i][j]);
+		printf("\n");
+    }
+	for(int i = 0;i < anstot6;i++)
+    {
+		printf("%d",ans6[i][0]);
+		for(int j =  1;j < 6;j++)
+			printf(",%d",ans6[i][j]);
+		printf("\n");
+    }
+	for(int i = 0;i < anstot7;i++)
+    {
+		printf("%d",ans7[i][0]);
+		for(int j =  1;j < 7;j++)
+			printf(",%d",ans7[i][j]);
+		printf("\n");
     }*/
 	exit(0);
     return 0;
