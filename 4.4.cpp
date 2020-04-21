@@ -59,9 +59,6 @@ int in[N];
 int out[N];
 void DFS(int first,int id)
 {
-	if(top >= 6)return;
-    if(id < first)return;
-	if(out[id] == -1)return;
     isD[id] = 1;
     stk[top++] = id;
 	if(top)c++;//faster
@@ -85,14 +82,14 @@ void DFS(int first,int id)
 	int num_of_edge = g[id][0];
 	for(int i = 1;i <= num_of_edge;i++)
     {
-        Next = g[id][i];
+        if((Next = g[id][i]) < first)continue;
         if(isD[Next] == 1){
             if(top >= 3 && Next == stk[0]){
 				creatAns();
 				if(top == 6)break;
 			}
         }else{
-            DFS(first,Next);
+            if(top < 6 && out[Next] > 0)DFS(first,Next);
         }
     }
     isD[id] = 0;
@@ -102,16 +99,15 @@ void DFS(int first,int id)
 bool ismk[N];
 void mktarget(int first,int second,int id,int step)
 {
-	if(ismk[id])return;
 	ismk[id] = 1;
 	if(step == 1){
 		int jie = g[id][0];
 		for(int i=1;i <= jie;i++)
-			mktarget(first,second,g[id][i],step+1);
+			if(!ismk[g[id][i]])mktarget(first,second,g[id][i],step+1);
 	}else if(step == 2){
 		int jie = g[id][0];
 		for(int i=1;i <= jie;i++)
-			mktarget(first,id,g[id][i],step+1);
+			if(!ismk[g[id][i]])mktarget(first,id,g[id][i],step+1);
 	}else{
 		int jie = g[id][0];
 		for(int i=1;i <= jie;i++)
