@@ -26,34 +26,8 @@ int yid[N];
 int isD[N];
 int stk[10];
 int top;
-/*struct A{
-	int id[8];//7时排序出错，过程未知
-	int num;
-	bool operator < (const struct A b) const{
-		if(this->num < b.num)return 1;
-		else if(this->num == b.num){
-			int p = 0;
-			int q = 0;
-			while(this->id[p] != -1 && b.id[q] != -1)
-			{
-				if(this->id[p] < b.id[q])return 1;
-				else if (this->id[p] > b.id[q])return 0;
-				p++;q++;
-			}
-		}
-		return 0;
-	}
-}ans[3000005];*/
 int ans3[3000005][3],ans4[3000005][4],ans5[3000005][5],ans6[3000005][6],ans7[3000005][7];
 int anstot3,anstot4,anstot5,anstot6,anstot7;
-/*void creatAns()
-{
-	ans[anstot].id[0] = yid[stk[0]];
-	ans[anstot].num = top;
-	for(int i = 1;i < top;i++)
-		ans[anstot].id[i] = yid[stk[i]];
-	ans[anstot++].id[top] = -1;
-}*/
 void creatAns()
 {
 	if(top == 3){
@@ -153,8 +127,8 @@ void DFS(int first,int id)
 bool ismk[N];
 void mktarget(int first,int second,int id,int step)
 {
-	if(ismk[id])return;
-	ismk[id] = 1;
+	//if(ismk[id])return;
+	//ismk[id] = 1;
 	if(step == 1){
 		int jie = g[id][0];
 		for(int i=1;i <= jie;i++)
@@ -199,7 +173,7 @@ void mktarget(int first,int second,int id,int step)
 			}
 		}
 	}
-	ismk[id] = 0;
+	//ismk[id] = 0;
 }
 void processIn(int i)
 {
@@ -217,9 +191,9 @@ void processOut(int i)
 }
 int main()
 {
-    freopen("/data/test_data.txt","r",stdin);
-    freopen("/projects/student/result.txt","w",stdout);
-    //int t = clock();
+    //freopen("/data/test_data.txt","r",stdin);
+    //freopen("/projects/student/result.txt","w",stdout);
+    int t = clock();
     int tmp;
     int n = 0;
     int m = 0;
@@ -267,9 +241,9 @@ int main()
 	int anstot = anstot3 + anstot4 + anstot5 + anstot6 + anstot7;
     printf("%d\n",anstot);
 	//cout << b << endl;
-	//double ti = clock() - t;
-    //printf("%fs\n",ti/CLOCKS_PER_SEC);
-    for(int i = 0;i < anstot3;i++)
+	double ti = clock() - t;
+    printf("%fs\n",ti/CLOCKS_PER_SEC);
+    /*for(int i = 0;i < anstot3;i++)
     {
 		printf("%d",ans3[i][0]);
 		for(int j =  1;j < 3;j++)
@@ -303,7 +277,7 @@ int main()
 		for(int j =  1;j < 7;j++)
 			printf(",%d",ans7[i][j]);
 		printf("\n");
-    }
+    }*/
 	exit(0);
     return 0;
 }
